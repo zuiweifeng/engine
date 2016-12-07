@@ -349,6 +349,7 @@ var RichText = cc.Class({
         if(CC_JSB) {
             labelSegment.setOverflow(1);
             var size = labelSegment.getContentSize();
+            labelSegment.enableWrap(false);
             labelSegment.setContentSize(size.width, this.lineHeight);
         }
 
