@@ -322,10 +322,10 @@ if (CC_JSB) {
     Mask.prototype.__superOnDestroy = Base.prototype.onDestroy;
     Mask.prototype.onDestroy = function () {
         this.__superOnDestroy();
-        if (this._clippingStencil){
+        if (this._clippingStencil) {
             this._clippingStencil.release();
+            this._clippingStencil = null;
         }
-        this._clippingStencil = null;
     };
 }
 
