@@ -608,7 +608,7 @@ else {
 
     /**
      * Indicate the running browser version
-     * @property {Number} browserVersion
+     * @property {String} browserVersion
      */
     sys.browserVersion = "";
     /* Determine the browser version number */
@@ -626,7 +626,7 @@ else {
 
     /**
      * Indicate the real pixel resolution of the whole game window
-     * @property {Number} windowPixelResolution
+     * @property {Size} windowPixelResolution
      */
     sys.windowPixelResolution = {
         width: ratio * w,
@@ -729,6 +729,7 @@ else {
         };
     }
 
+    var _supportWebp = _tmpCanvas1.toDataURL('image/webp').startsWith('data:image/webp');
     var _supportCanvas = !!_tmpCanvas1.getContext("2d");
     var _supportWebGL = false;
     if (win.WebGLRenderingContext) {
@@ -792,7 +793,8 @@ else {
      */
     var capabilities = sys.capabilities = {
         "canvas": _supportCanvas,
-        "opengl": _supportWebGL
+        "opengl": _supportWebGL,
+        "webp": _supportWebp,
     };
     if (docEle['ontouchstart'] !== undefined || doc['ontouchstart'] !== undefined || nav.msPointerEnabled)
         capabilities["touches"] = true;
