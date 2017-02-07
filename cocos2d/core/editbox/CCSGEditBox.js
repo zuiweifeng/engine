@@ -864,7 +864,6 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
         var editBoxSize = this._editBox.getContentSize();
         if(!this._textLabel) {
             this._textLabel = new _ccsg.Label();
-            this._textLabel.setVisible(false);
             this._textLabel.setAnchorPoint(cc.p(0, 1));
             this._textLabel.setOverflow(_ccsg.Label.Overflow.CLAMP);
             this._editBox.addChild(this._textLabel, 100);
@@ -983,6 +982,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
                 this._edTxt.focus();
             }
         }
+        this._editingMode = true;
     };
 
     proto._endEditing = function() {
@@ -990,6 +990,7 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
             this._edTxt.style.display = 'none';
         }
         this._showLabels();
+        this._editingMode = false;
     };
 
     proto._setFont = function (fontStyle) {
@@ -1112,9 +1113,13 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
                     this._placeholderLabel.setString(this._editBox._placeholderText);
                     this._placeholderLabel.setColor(this._editBox._placeholderColor);
                 }
-
-                if(this._textLabel) {
-                    this._textLabel.setVisible(false);
+                if(!this._editingMode) {
+                    if (this._placeholderLabel) {
+                        this._placeholderLabel.setVisible(true);
+                    }
+                    if (this._textLabel) {
+                        this._textLabel.setVisible(false);
+                    }
                 }
             }
             else {
@@ -1122,8 +1127,13 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
                 if(this._textLabel) {
                     this._textLabel.setColor(this._editBox._textColor);
                 }
-                if(this._placeholderLabel) {
-                    this._placeholderLabel.setVisible(false);
+                if (!this._editingMode) {
+                    if(this._placeholderLabel) {
+                        this._placeholderLabel.setVisible(false);
+                    }
+                    if(this._textLabel) {
+                        this._textLabel.setVisible(true);
+                    }
                 }
 
                 this._updateLabelStringStyle();
@@ -1170,20 +1180,17 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
         this._edTxt = null;
     };
 
-    proto.initializeRenderCmd = function (node) {
-        this._editBox = node;
-
-        //it's a dom node, may be assigned with Input or TextArea.
-        this._edFontSize = 14;
-        this._edFontName = 'Arial';
-        this._textLabel = null;
-        this._placeholderLabel = null;
-    };
+    //it's a dom node, may be assigned with Input or TextArea.
+    proto._edFontSize = 14;
+    proto._edFontName = 'Arial';
+    proto._textLabel = null;
+    proto._placeholderLabel = null;
+    proto._editingMode = false;
 
     //define the canvas render command
     _ccsg.EditBox.CanvasRenderCmd = function (node) {
-        _ccsg.Node.CanvasRenderCmd.call(this, node);
-        this.initializeRenderCmd(node);
+        this._rootCtor(node);
+        this._editBox = node;
     };
 
     var canvasRenderCmdProto = _ccsg.EditBox.CanvasRenderCmd.prototype = Object.create(_ccsg.Node.CanvasRenderCmd.prototype);
@@ -1195,11 +1202,10 @@ _ccsg.EditBox.KeyboardReturnType = KeyboardReturnType;
         this.updateMatrix();
     };
 
-
     //define the webgl render command
     _ccsg.EditBox.WebGLRenderCmd = function (node) {
-        _ccsg.Node.WebGLRenderCmd.call(this, node);
-        this.initializeRenderCmd(node);
+        this._rootCtor(node);
+        this._editBox = node;
     };
 
     var webGLRenderCmdProto = _ccsg.EditBox.WebGLRenderCmd.prototype = Object.create(_ccsg.Node.WebGLRenderCmd.prototype);
