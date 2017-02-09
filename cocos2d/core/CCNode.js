@@ -515,7 +515,10 @@ var Node = cc.Class({
         for (i = 0, len = this._components.length; i < len; ++i) {
             var component = this._components[i];
             // destroy immediate so its _onPreDestroy can be called
-            component._destroyImmediate();
+            if (component){
+                component._destroyImmediate();
+            }
+
         }
 
         // Actions
