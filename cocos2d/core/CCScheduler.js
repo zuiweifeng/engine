@@ -412,7 +412,7 @@ cc.Scheduler = cc._Class.extend({
     },
 
     _appendIn:function (ppList, callback, target, paused) {
-        var self = this, 
+        var self = this,
             listElement = ListEntry.get(null, null, callback, target, 0, paused, false);
         ppList.push(listElement);
 
@@ -467,7 +467,7 @@ cc.Scheduler = cc._Class.extend({
         for(i=0,list=this._updatesNegList, len = list.length; i<len; i++){
             entry = list[i];
             if (!entry.paused && !entry.markedForDeletion)
-                entry.isUpdate ? entry.target.update(dt) : entry.callback.call(entry.target, dt);
+                entry.isUpdate ? (entry.target.update && entry.target.update(dt)) : entry.callback.call(entry.target, dt);
         }
 
         for(i=0, list=this._updates0List, len=list.length; i<len; i++){
@@ -701,7 +701,7 @@ cc.Scheduler = cc._Class.extend({
         }
     },
 
-    /** 
+    /**
      * !#en Unschedules the update callback for a given target.
      * !#zh 取消指定对象的 update 定时器。
      * @method unscheduleUpdate
@@ -722,7 +722,7 @@ cc.Scheduler = cc._Class.extend({
         }
     },
 
-    /** 
+    /**
      * !#en
      * Unschedules all scheduled callbacks for a given target.
      * This also includes the "update" callback.
@@ -741,7 +741,7 @@ cc.Scheduler = cc._Class.extend({
 
         if (element) {
             var timers = element.timers;
-            if (timers.indexOf(element.currentTimer) > -1 && 
+            if (timers.indexOf(element.currentTimer) > -1 &&
                 (!element.currentTimerSalvaged)) {
                 element.currentTimerSalvaged = true;
             }
@@ -828,7 +828,7 @@ cc.Scheduler = cc._Class.extend({
         }
     },
 
-    /** 
+    /**
      * !#en Checks whether a callback for a given target is scheduled.
      * !#zh 检查指定的回调函数和回调对象组合是否存在定时器。
      * @method isScheduled
@@ -974,7 +974,7 @@ cc.Scheduler = cc._Class.extend({
         cc.assertID(target, 1503);
 
         //customer selectors
-        var self = this, 
+        var self = this,
             instanceId = getTargetId(target),
             element = self._hashForTimers[instanceId];
         if (element) {
