@@ -754,6 +754,20 @@ sp.Skeleton = cc.Class({
     },
 
     /**
+     * !#en Find animation with specified name.
+     * !#zh 查找指定名称的动画
+     * @method findAnimation
+     * @param {String} name
+     * @returns {sp.spine.Animation}
+     */
+    findAnimation: function (name) {
+        if (this._sgNode) {
+            return this._sgNode.findAnimation(name);
+        }
+        return null;
+    },
+
+    /**
      * !#en Returns track entry by trackIndex.<br>
      * Returns a {{#crossLinkModule "sp.spine"}}sp.spine{{/crossLinkModule}}.TrackEntry object.
      * !#zh 通过 track 索引获取 TrackEntry。<br>
@@ -833,6 +847,18 @@ sp.Skeleton = cc.Class({
     },
 
     /**
+     * !#en Set the interrupt event listener.
+     * !#zh 用来设置动画被打断的事件监听。
+     * @method setInterruptListener
+     * @param {function} listener
+     */
+    setInterruptListener: function (listener) {
+        if (this._sgNode) {
+            this._sgNode.setInterruptListener(listener);
+        }
+    },
+
+    /**
      * !#en Set the end event listener.
      * !#zh 用来设置动画播放完后的事件监听。
      * @method setEndListener
@@ -841,6 +867,18 @@ sp.Skeleton = cc.Class({
     setEndListener: function (listener) {
         if (this._sgNode) {
             this._sgNode.setEndListener(listener);
+        }
+    },
+
+    /**
+     * !#en Set the dispose event listener.
+     * !#zh 用来设置动画将被销毁的事件监听。
+     * @method setDisposeListener
+     * @param {function} listener
+     */
+    setDisposeListener: function (listener) {
+        if (this._sgNode) {
+            this._sgNode.setDisposeListener(listener);
         }
     },
 
@@ -870,7 +908,7 @@ sp.Skeleton = cc.Class({
 
     /**
      * !#en Set the start event listener for specified TrackEntry (only supported on Web).
-     * !#zh 用来为指定的 TrackEntry 设置动画开始播放的事件监听。
+     * !#zh 用来为指定的 TrackEntry 设置动画开始播放的事件监听。（只支持 Web 平台）
      * @method setTrackStartListener
      * @param {sp.spine.TrackEntry} entry
      * @param {function} listener
@@ -882,8 +920,21 @@ sp.Skeleton = cc.Class({
     },
 
     /**
+     * !#en Set the interrupt event listener for specified TrackEntry (only supported on Web).
+     * !#zh 用来为指定的 TrackEntry 设置动画被打断的事件监听。（只支持 Web 平台）
+     * @method setTrackInterruptListener
+     * @param {sp.spine.TrackEntry} entry
+     * @param {function} listener
+     */
+    setTrackInterruptListener: function (entry, listener) {
+        if (this._sgNode) {
+            this._sgNode.setTrackInterruptListener(entry, listener);
+        }
+    },
+
+    /**
      * !#en Set the end event listener for specified TrackEntry (only supported on Web).
-     * !#zh 用来为指定的 TrackEntry 设置动画播放结束的事件监听。
+     * !#zh 用来为指定的 TrackEntry 设置动画播放结束的事件监听。（只支持 Web 平台）
      * @method setTrackEndListener
      * @param {sp.spine.TrackEntry} entry
      * @param {function} listener
@@ -895,8 +946,21 @@ sp.Skeleton = cc.Class({
     },
 
     /**
+     * !#en Set the dispose event listener for specified TrackEntry (only supported on Web).
+     * !#zh 用来为指定的 TrackEntry 设置动画即将被销毁的事件监听。（只支持 Web 平台）
+     * @method setTrackDisposeListener
+     * @param {sp.spine.TrackEntry} entry
+     * @param {function} listener
+     */
+    setTrackDisposeListener: function(entry, listener){
+        if (this._sgNode) {
+            this._sgNode.setTrackDisposeListener(entry, listener);
+        }
+    },
+
+    /**
      * !#en Set the complete event listener for specified TrackEntry (only supported on Web).
-     * !#zh 用来为指定的 TrackEntry 设置动画一次循环播放结束的事件监听。
+     * !#zh 用来为指定的 TrackEntry 设置动画一次循环播放结束的事件监听。（只支持 Web 平台）
      * @method setTrackCompleteListener
      * @param {sp.spine.TrackEntry} entry
      * @param {function} listener
@@ -909,7 +973,7 @@ sp.Skeleton = cc.Class({
 
     /**
      * !#en Set the event listener for specified TrackEntry (only supported on Web).
-     * !#zh 用来为指定的 TrackEntry 设置动画帧事件的监听。
+     * !#zh 用来为指定的 TrackEntry 设置动画帧事件的监听。（只支持 Web 平台）
      * @method setTrackEventListener
      * @param {sp.spine.TrackEntry} entry
      * @param {function} listener
