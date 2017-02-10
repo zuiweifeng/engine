@@ -242,10 +242,6 @@ sp._SGSkeletonAnimation = sp._SGSkeleton.extend({
         this._state.clearTracks();
     },
 
-    findAnimation: function (name) {
-        return this._skeleton.data.findAnimation(name);
-    },
-
     /**
      * Clears track of animation state by trackIndex.
      * @param {Number} trackIndex

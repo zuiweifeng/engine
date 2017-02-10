@@ -794,12 +794,6 @@ sp.Skeleton = cc.Class({
         }
     },
 
-    findAnimation: function (name) {
-        if (this._sgNode) {
-            return this._sgNode.findAnimation(name);
-        }
-    },
-
     /**
      * !#en Clears track of animation state by trackIndex.
      * !#zh 清除出指定 track 的动画状态。
