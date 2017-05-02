@@ -210,14 +210,6 @@ var game = {
      */
     onStart: null,
 
-    /**
-     * !#en Callback when game exits.
-     * !#zh 当游戏结束后的回调函数。
-     * @method onStop
-     * @type {Function}
-     */
-    onStop: null,
-
 //@Public Methods
 
 //  @Game play control
@@ -231,7 +223,7 @@ var game = {
         var self = this, config = self.config, CONFIG_KEY = self.CONFIG_KEY;
         config[CONFIG_KEY.frameRate] = frameRate;
         if (self._intervalId)
-            window.cancelAnimationFrame(self._intervalId);
+            window.cancelAnimFrame(self._intervalId);
         self._intervalId = 0;
         self._paused = true;
         self._setAnimFrame();
@@ -263,7 +255,7 @@ var game = {
         }
         // Pause main loop
         if (this._intervalId)
-            window.cancelAnimationFrame(this._intervalId);
+            window.cancelAnimFrame(this._intervalId);
         this._intervalId = 0;
     },
 
@@ -511,11 +503,11 @@ var game = {
 //  @Time ticker section
     _setAnimFrame: function () {
         this._lastTime = new Date();
-        this._frameTime = 1000 / game.config[game.CONFIG_KEY.frameRate];
         var frameRate = game.config[game.CONFIG_KEY.frameRate];
-        if(frameRate !== 60 && frameRate !== 30) {
+        this._frameTime = 1000 / frameRate;
+        if (frameRate !== 60 && frameRate !== 30) {
             window.requestAnimFrame = this._stTime;
-            window.cancelAnimationFrame = this._ctTime;
+            window.cancelAnimFrame = this._ctTime;
         }
         else {
             window.requestAnimFrame = window.requestAnimationFrame ||
@@ -524,7 +516,7 @@ var game = {
             window.oRequestAnimationFrame ||
             window.msRequestAnimationFrame ||
             this._stTime;
-            window.cancelAnimationFrame = window.cancelAnimationFrame ||
+            window.cancelAnimFrame = window.cancelAnimationFrame ||
             window.cancelRequestAnimationFrame ||
             window.msCancelRequestAnimationFrame ||
             window.mozCancelRequestAnimationFrame ||
@@ -560,7 +552,7 @@ var game = {
             if (!self._paused) {
                 if (frameRate === 30) {
                     if (skip = !skip) {
-                        window.requestAnimFrame(callback);
+                        self._intervalId = window.requestAnimFrame(callback);
                         return;
                     }
                 }
@@ -570,7 +562,7 @@ var game = {
             }
         };
 
-        window.requestAnimFrame(callback);
+        self._intervalId = window.requestAnimFrame(callback);
         self._paused = false;
     },
 
