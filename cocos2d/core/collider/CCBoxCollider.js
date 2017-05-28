@@ -48,6 +48,7 @@ var BoxCollider = cc.Class({
          * @type {Vec2}
          */
         offset: {
+            tooltip: CC_DEV && 'i18n:COMPONENT.physics.physics_collider.offset',
             get: function () {
                 return this._offset;
             },
@@ -64,6 +65,7 @@ var BoxCollider = cc.Class({
          * @type {Size}
          */
         size: {
+            tooltip: CC_DEV && 'i18n:COMPONENT.physics.physics_collider.size',            
             get: function () {
                 return this._size;
             },
@@ -72,6 +74,15 @@ var BoxCollider = cc.Class({
                 this._size.height = value.height < 0 ? 0 : value.height;
             },
             type: cc.Size
+        }
+    },
+
+    resetInEditor: CC_EDITOR && function () {
+        var size = this.node.getContentSize();
+        if (size.width !== 0 && size.height !== 0) {
+            this.size = cc.size( size );
+            this.offset.x = (0.5 - this.node.anchorX) * size.width;
+            this.offset.y = (0.5 - this.node.anchorY) * size.height;
         }
     }
 });

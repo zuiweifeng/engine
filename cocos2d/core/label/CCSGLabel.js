@@ -24,7 +24,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-var EventTarget = require("../cocos2d/core/event/event-target");
+var EventTarget = require("../event/event-target");
 
 var FntLoader = {
     INFO_EXP: /info [^\n]*(\n|$)/gi,
@@ -267,7 +267,6 @@ _ccsg.Label = _ccsg.Node.extend({
         this._tailoredTopY =  0;
         this._tailoredBottomY =  0;
         this._bmfontScale =  1.0;
-        this._spacingX =  0;
         this._horizontalKernings =  [];
         this._lineBreakWithoutSpaces =  false;
 
@@ -670,10 +669,7 @@ _ccsg.Label = _ccsg.Node.extend({
         }
         return _ccsg.Node.prototype._getHeight.call(this);
     },
-});
-
-cc.BMFontHelper = {
-    _alignText: function() {
+        _alignText: function() {
         var ret = true;
 
         do {
@@ -922,7 +918,7 @@ cc.BMFontHelper = {
                 letterDef = this._fontAtlas.getLetterDefinitionForChar(character);
                 if (!letterDef) {
                     this._recordPlaceholderInfo(letterIndex, character);
-                    console.log("Can't find letter definition in font file for letter:" + character);
+                    console.log("Can't find letter definition in texture atlas " + this._config.atlasName + " for letter:" + character);
                     continue;
                 }
 
@@ -1329,12 +1325,11 @@ cc.BMFontHelper = {
             }
         }
     }
-};
+});
 
 
 var _p = _ccsg.Label.prototype;
 cc.js.addon(_p, EventTarget.prototype);
-cc.js.mixin(_p, cc.BMFontHelper);
 
 _ccsg.Label.Type = cc.Enum({
     TTF: 0,

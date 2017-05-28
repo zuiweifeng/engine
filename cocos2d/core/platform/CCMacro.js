@@ -1141,7 +1141,7 @@ cc.getImageFormatByData = function (imgData) {
 
 /**
  * Predefined constants
- * @enum Macro
+ * @enum macro
  * @type {Object}
  */
 cc.macro = {
@@ -1659,7 +1659,7 @@ cc.macro = {
      *
      * @property {Number} FIX_ARTIFACTS_BY_STRECHING_TEXEL
      */
-    FIX_ARTIFACTS_BY_STRECHING_TEXEL: 1,
+    FIX_ARTIFACTS_BY_STRECHING_TEXEL: 0,
 
     /**
      * Position of the FPS (Default: 0,0 (bottom-left corner))<br/>
@@ -1885,7 +1885,29 @@ cc.macro = {
      * 它的值被 native 宏 CC_ENABLE_GC_FOR_NATIVE_OBJECTS 所控制，修改 JS 宏的值不会产生任何效果。
      * @property {Number} ENABLE_GC_FOR_NATIVE_OBJECTS
      */
-    ENABLE_GC_FOR_NATIVE_OBJECTS: true
+    ENABLE_GC_FOR_NATIVE_OBJECTS: true,
+
+    /**
+     * !#en 
+     * Whether or not enabled tiled map auto culling.
+     * If you use cc.Camera as tiled map's camera, please disable this macro.
+     * !#zh
+     * 是否开启瓦片地图的自动裁减功能。
+     * 如果需要使用 cc.Camera 来作为瓦片地图的摄像机的话，那么请关闭此宏
+     * @property {Boolean} ENABLE_TILEDMAP_CULLING
+     * @default true
+     */
+    ENABLE_TILEDMAP_CULLING: true,
+
+    /**
+     * !#en 
+     * The max concurrent task number for the downloader
+     * !#zh
+     * 下载任务的最大并发数限制，在安卓平台部分机型或版本上可能需要限制在较低的水平
+     * @property {Number} DOWNLOAD_MAX_CONCURRENT
+     * @default 64
+     */
+    DOWNLOAD_MAX_CONCURRENT: 64,
 };
 
 /**

@@ -23,10 +23,11 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-// should not use long variable name because eval breaks uglify's mangle operation in this file
-var m = {};
+var JS = require('../platform/js');
 
-m.propertyDefine = function (ctor, sameNameGetSets, diffNameGetSets) {
+var misc = {};
+
+misc.propertyDefine = function (ctor, sameNameGetSets, diffNameGetSets) {
     function define (np, propName, getter, setter) {
         var pd = Object.getOwnPropertyDescriptor(np, propName);
         if (pd) {
@@ -63,7 +64,7 @@ m.propertyDefine = function (ctor, sameNameGetSets, diffNameGetSets) {
  * @return {Number}
  * Constructor
  */
-m.NextPOT = function (x) {
+misc.NextPOT = function (x) {
     x = x - 1;
     x = x | (x >> 1);
     x = x | (x >> 2);
@@ -88,20 +89,39 @@ m.NextPOT = function (x) {
 //
 //DirtyFlags.WIDGET = DirtyFlags.TRANSFORM | DirtyFlags.SIZE;
 
-// wrap a new scope to enalbe minify
+if (CC_EDITOR) {
+    // use anonymous function here to ensure it will not being hoisted without CC_EDITOR
 
-// jshint evil: true
-m.cleanEval = function (code) {
-    return eval(code);
-};
-m.cleanEval_F = function (code, F) {
-    return eval(code);
-};
-m.cleanEval_fireClass = function (code) {
-    var fireClass = eval(code);
-    return fireClass;
-};
-// jshint evil: false
+    misc.tryCatchFunctor_EDITOR = function (funcName, forwardArgs, afterCall, bindArg) {
+        function call_FUNC_InTryCatch (_R_ARGS_) {
+            try {
+                target._FUNC_(_U_ARGS_);
+            }
+            catch (e) {
+                cc._throw(e);
+            }
+            _AFTER_CALL_
+        }
+        // use evaled code to generate named function
+        return Function('arg', 'return ' + call_FUNC_InTryCatch
+                    .toString()
+                    .replace(/_FUNC_/g, funcName)
+                    .replace('_R_ARGS_', 'target' + (forwardArgs ? ', ' + forwardArgs : ''))
+                    .replace('_U_ARGS_', forwardArgs || '')
+                    .replace('_AFTER_CALL_', afterCall || ''))(bindArg);
+    };
+}
 
+misc.imagePool = new JS.Pool(function (img) {
+                            if (img instanceof HTMLImageElement) {
+                                img.src = this._smallImg;
+                                return true;
+                            }
+                            return false;
+                       }, 10);
+misc.imagePool.get = function () {
+    return this._get() || new Image();
+};
+misc.imagePool._smallImg = "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";
 
-module.exports = m;
+module.exports = misc;

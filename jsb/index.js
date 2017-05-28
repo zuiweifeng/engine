@@ -51,8 +51,8 @@ catch (e) {
 }
 
 // Macros, if "global_defs" not preprocessed by uglify, just declare them globally
-eval(
-    /* use EVAL to prevent the uglify from renaming symbols */
+Function(
+    /* use evaled code to prevent the uglify from renaming symbols */
     'if(typeof CC_TEST=="undefined")' +
         'window.CC_TEST=typeof describe!="undefined"||typeof QUnit=="object";' +
     'if(typeof CC_EDITOR=="undefined")' +
@@ -61,7 +61,7 @@ eval(
         'window.CC_DEV=CC_EDITOR||CC_TEST;' +
     'if(typeof CC_JSB=="undefined")' +
         'window.CC_JSB=true;'
-);
+)();
 
 require('./jsb-predefine');
 require('./jsb-game');
@@ -81,6 +81,7 @@ require('./jsb-action');
 require('./jsb-etc');
 require('./jsb-audio');
 require('./jsb-tiledmap');
+require('./jsb-box2d');
 require('./jsb-dragonbones');
 
 if (cc.runtime) {

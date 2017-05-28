@@ -39,12 +39,11 @@ var JS = require('../platform/js');
  * !#zh
  * cc.Rect类的构造函数。可以通过 {{#crossLink "cc/rect:method"}} cc.rect {{/crossLink}} 简便方法进行创建。
  *
- * @method Rect
+ * @method constructor
  * @param {Number} [x=0]
  * @param {Number} [y=0]
  * @param {Number} [w=0]
  * @param {Number} [h=0]
- * @return {Rect}
  */
 function Rect (x, y, w, h) {
     if (x && typeof x === 'object') {
@@ -60,6 +59,19 @@ function Rect (x, y, w, h) {
 }
 JS.extend(Rect, ValueType);
 require('../platform/CCClass').fastDefine('cc.Rect', Rect, { x: 0, y: 0, width: 0, height: 0 });
+
+/**
+ * @property {Number} x
+ */
+/**
+ * @property {Number} y
+ */
+/**
+ * @property {Number} width
+ */
+/**
+ * @property {Number} height
+ */
 
 /**
  * !#en Creates a rectangle from two coordinate values.
@@ -203,13 +215,13 @@ proto.toString = function () {
  * @property xMin
  * @type {Number}
  */
-Object.defineProperty(proto, 'xMin', {
-    get: function () { return this.x; },
-    set: function (value) {
+JS.getset(proto, 'xMin',
+    function () { return this.x; },
+    function (value) {
         this.width += this.x - value;
         this.x = value;
     }
-});
+);
 
 /**
  * !#en TODO
@@ -217,13 +229,13 @@ Object.defineProperty(proto, 'xMin', {
  * @property yMin
  * @type {Number}
  */
-Object.defineProperty(proto, 'yMin', {
-    get: function () { return this.y; },
-    set: function (value) {
+JS.getset(proto, 'yMin',
+    function () { return this.y; },
+    function (value) {
         this.height += this.y - value;
         this.y = value;
     }
-});
+);
 
 /**
  * !#en TODO
@@ -231,10 +243,10 @@ Object.defineProperty(proto, 'yMin', {
  * @property xMax
  * @type {Number}
  */
-Object.defineProperty(proto, 'xMax', {
-    get: function () { return this.x + this.width; },
-    set: function (value) { this.width = value - this.x; }
-});
+JS.getset(proto, 'xMax',
+    function () { return this.x + this.width; },
+    function (value) { this.width = value - this.x; }
+);
 
 /**
  * !#en TODO
@@ -242,42 +254,56 @@ Object.defineProperty(proto, 'xMax', {
  * @property yMax
  * @type {Number}
  */
-Object.defineProperty(proto, 'yMax', {
-    get: function () { return this.y + this.height; },
-    set: function (value) { this.height = value - this.y; }
-});
+JS.getset(proto, 'yMax',
+    function () { return this.y + this.height; },
+    function (value) { this.height = value - this.y; }
+);
 
 /**
- * !#en TODO
+ * !#en The position of the center of the rectangle.
  * !#zh 矩形的中心点。
- * @property center
- * @type {Number}
+ * @property {Vec2} center
  */
-Object.defineProperty(proto, 'center', {
-    get: function () {
+JS.getset(proto, 'center',
+    function () {
         return new cc.Vec2(this.x + this.width * 0.5,
             this.y + this.height * 0.5);
     },
-    set: function (value) {
+    function (value) {
         this.x = value.x - this.width * 0.5;
         this.y = value.y - this.height * 0.5;
     }
-});
+);
 
 /**
- * !#en TODO
+ * !#en The X and Y position of the rectangle.
+ * !#zh 矩形的 x 和 y 坐标。
+ * @property {Vec2} origin
+ */
+JS.getset(proto, 'origin',
+    function () {
+        return new cc.Vec2(this.x, this.y);
+    },
+    function (value) {
+        this.x = value.x;
+        this.y = value.y;
+    }
+);
+
+/**
+ * !#en Width and height of the rectangle.
  * !#zh 矩形的大小。
  * @property {Size} size
  */
-Object.defineProperty(proto, 'size', {
-    get: function () {
+JS.getset(proto, 'size',
+    function () {
         return new cc.Size(this.width, this.height);
     },
-    set: function (value) {
+    function (value) {
         this.width = value.width;
         this.height = value.height;
     }
-});
+);
 
 /**
  * !#en TODO
@@ -344,7 +370,7 @@ cc.Rect = Rect;
  * !#zh
  * 该方法用来快速创建一个新的矩形。{{#crossLink "Rect/Rect:method"}}cc.Rect{{/crossLink}}
  * @method rect
- * @param {Number[]|Number} [x=0]
+ * @param {Number} [x=0]
  * @param {Number} [y=0]
  * @param {Number} [w=0]
  * @param {Number} [h=0]

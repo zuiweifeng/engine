@@ -24,8 +24,8 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-var PNGReader = require('../cocos2d/particle/CCPNGReader');
-var tiffReader = require('../cocos2d/particle/CCTIFFReader');
+var PNGReader = require('./CCPNGReader');
+var tiffReader = require('./CCTIFFReader');
 
 // ideas taken from:
 //   . The ocean spray in your face [Jeff Lander]
@@ -2227,21 +2227,4 @@ _ccsg.ParticleSystem.Type = cc.Enum({
      * Living particles are attached to the emitter and are translated along with it.
      */
     GROUPED: 2
-});
-
-// fireball#2856
-
-var particleSystemPro = _ccsg.ParticleSystem.prototype;
-Object.defineProperty(particleSystemPro, 'visible', {
-    get: _ccsg.Node.prototype.isVisible,
-    set: particleSystemPro.setVisible
-});
-
-Object.defineProperty(particleSystemPro, 'ignoreAnchor', {
-    get: _ccsg.Node.prototype.isIgnoreAnchorPointForPosition,
-    set: particleSystemPro.ignoreAnchorPointForPosition
-});
-
-Object.defineProperty(particleSystemPro, 'opacityModifyRGB', {
-    get: particleSystemPro.isOpacityModifyRGB
 });

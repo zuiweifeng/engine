@@ -53,17 +53,6 @@ function uint8ArrayToUint32Array (uint8Arr) {
  * @property {Array}    properties  - Properties of the layer info.
  */
 cc.TMXLayerInfo = cc._Class.extend(/** @lends cc.TMXLayerInfo# */{
-    properties:null,
-
-	  name:"",
-    _layerSize:null,
-    _tiles:null,
-    visible:null,
-    _opacity:null,
-    ownTiles:true,
-    _minGID:100000,
-    _maxGID:0,
-    offset:null,
 
     ctor:function () {
         this.properties = {};
@@ -109,15 +98,6 @@ cc.TMXLayerInfo = cc._Class.extend(/** @lends cc.TMXLayerInfo# */{
  * @property {Array}    properties  - Properties of the ObjectGroup info.
  */
 cc.TMXObjectGroupInfo = cc._Class.extend(/** @lends cc.TMXObjectGroupInfo# */{
-    properties:null,
-
-    name:"",
-    _objects:null,
-    visible:null,
-    _color: null,
-    _opacity:null,
-    offset:null,
-    _draworder: '',
 
     ctor:function () {
         this.properties = {};
@@ -165,36 +145,27 @@ cc.TMXObjectGroupInfo = cc._Class.extend(/** @lends cc.TMXObjectGroupInfo# */{
  * @property {number} spacing - Spacing
  * @property {number} margin - Margin
  * @property {string} sourceImage - Filename containing the tiles (should be sprite sheet / texture atlas)
- * @property {cc.Size|null} imageSize - Size in pixels of the image
+ * @property {cc.Size} imageSize - Size in pixels of the image
  */
 cc.TMXTilesetInfo = cc._Class.extend(/** @lends cc.TMXTilesetInfo# */{
 
-    //Tileset name
-    name:"",
-
-    //First grid
-    firstGid:0,
-    _tileSize:null,
-
-    //Spacing
-    spacing:0,
-
-    //Margin
-    margin:0,
-
-    // tile offset
-    tileOffset: null,
-
-    //Filename containing the tiles (should be sprite sheet / texture atlas)
-    sourceImage:"",
-
-    //Size in pixels of the image
-    imageSize:null,
-
     ctor:function () {
-        this._tileSize = cc.size(0, 0);
-        this.tileOffset = cc.p(0, 0);
+        // Tileset name
+        this.name = "";
+        // First grid
+        this.firstGid = 0;
+        // Spacing
+        this.spacing = 0;
+        // Margin
+        this.margin = 0;
+        // Filename containing the tiles (should be sprite sheet / texture atlas)
+        this.sourceImage = "";
+        // Size in pixels of the image
         this.imageSize = cc.size(0, 0);
+
+        this.tileOffset = cc.p(0, 0);
+
+        this._tileSize = cc.size(0, 0);
     },
 
     /**
@@ -877,7 +848,7 @@ cc.TMXMapInfo = cc.SAXParser.extend(/** @lends cc.TMXMapInfo# */{
         var objects = selGroup.querySelectorAll('object');
         var getContentScaleFactor = cc.director.getContentScaleFactor();
         if (objects) {
-            for (j = 0; j < objects.length; j++) {
+            for (var j = 0; j < objects.length; j++) {
                 var selObj = objects[j];
                 // The value for "type" was blank or not a valid class name
                 // Create an instance of TMXObjectInfo to store the object and its properties

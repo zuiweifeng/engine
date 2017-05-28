@@ -27,6 +27,7 @@ var JS = require('../platform/js');
 var Pipeline = require('./pipeline');
 var Texture2D = require('../textures/CCTexture2D');
 var loadUuid = require('./uuid-loader');
+var misc = require('../utils/misc');
 
 function loadNothing (item, callback) {
     callback(null, null);
@@ -55,6 +56,10 @@ function loadImage (item, callback) {
     tex.url = url;
     tex.initWithElement(item.content);
     tex.handleLoadedTexture();
+    if (cc._renderType === cc.game.RENDER_TYPE_WEBGL) {
+        // Image element no longer needed
+        misc.imagePool.put(item.content);
+    }
     cc.textureCache.cacheImage(url, tex);
     callback(null, tex);
 }
@@ -117,14 +122,14 @@ var ID = 'Loader';
  */
 /**
  * Constructor of Loader, you can pass custom supported types.
- * @example
- *  var loader = new Loader({
- *      // This will match all url with `.scene` extension or all url with `scene` type
- *      'scene' : function (url, callback) {}
- *  });
  *
- * @method Loader
+ * @method constructor
  * @param {Object} extMap Custom supported types with corresponded handler
+ * @example
+ *var loader = new Loader({
+ *    // This will match all url with `.scene` extension or all url with `scene` type
+ *    'scene' : function (url, callback) {}
+ *});
  */
 var Loader = function (extMap) {
     this.id = ID;
@@ -134,27 +139,26 @@ var Loader = function (extMap) {
     this.extMap = JS.mixin(extMap, defaultMap);
 };
 Loader.ID = ID;
-JS.mixin(Loader.prototype, {
-    /**
-     * Add custom supported types handler or modify existing type handler.
-     * @method addHandlers
-     * @param {Object} extMap Custom supported types with corresponded handler
-     */
-    addHandlers: function (extMap) {
-        this.extMap = JS.mixin(this.extMap, extMap);
-    },
 
-    handle: function (item, callback) {
-        var loadFunc = this.extMap[item.type] || this.extMap['default'];
-        loadFunc.call(this, item, function (err, result) {
-            if (err) {
-                callback && callback(err);
-            }
-            else {
-                callback && callback(null, result);
-            }
-        });
-    }
-});
+/**
+ * Add custom supported types handler or modify existing type handler.
+ * @method addHandlers
+ * @param {Object} extMap Custom supported types with corresponded handler
+ */
+Loader.prototype.addHandlers = function (extMap) {
+    this.extMap = JS.mixin(this.extMap, extMap);
+};
+
+Loader.prototype.handle = function (item, callback) {
+    var loadFunc = this.extMap[item.type] || this.extMap['default'];
+    loadFunc.call(this, item, function (err, result) {
+        if (err) {
+            callback && callback(err);
+        }
+        else {
+            callback && callback(null, result);
+        }
+    });
+};
 
 Pipeline.Loader = module.exports = Loader;

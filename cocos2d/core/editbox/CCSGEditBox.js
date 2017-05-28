@@ -30,7 +30,7 @@
 var SCROLLY = 40;
 var TIMER_NAME = 400;
 var LEFT_PADDING = 2;
-var Utils = require('../cocos2d/core/platform/utils');
+var Utils = require('../platform/utils');
 
 function adjustEditBoxPosition (editBox) {
     var worldPos = editBox.convertToWorldSpace(cc.p(0,0));
@@ -239,11 +239,12 @@ _ccsg.EditBox = _ccsg.Node.extend({
     _keyboardReturnType: KeyboardReturnType.DEFAULT,
     _maxLength: 50,
     _text: '',
-    _textColor: null,
     _placeholderText: '',
     _alwaysOnTop: false,
     _placeholderFontName: '',
     _placeholderFontSize: 14,
+    __fullscreen: false,
+    __autoResize: false,
     _placeholderColor: null,
     _className: 'EditBox',
 
@@ -320,9 +321,14 @@ _ccsg.EditBox = _ccsg.Node.extend({
         this._renderCmd.stayOnTop(this._alwaysOnTop);
     },
 
-    cleanup: function () {
-        this._super();
+    onEnter: function () {
+        _ccsg.Node.prototype.onEnter.call(this);
+        //in case the EditBox being used after changing parent
+        this.createDomElementIfNeeded();
+    },
 
+    onExit: function () {
+        _ccsg.Node.prototype.onExit.call(this);
         this._renderCmd._removeDomFromGameContainer();
     },
 

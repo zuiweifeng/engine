@@ -214,7 +214,7 @@ cc.game = {
      * @param {Node} node - The node to be made persistent
      */
     addPersistRootNode: function (node) {
-        if (!(node instanceof cc.Node) || !node.uuid) {
+        if (!cc.Node.isNode(node) || !node.uuid) {
             cc.warnID(3803);
             return;
         }

@@ -199,15 +199,13 @@ window._ccsg = {
     TMXObjectImage: cc.TMXObjetImage,
     TMXObjectShape: cc.TMXObjectShape,
     TMXLayer: cc.TMXLayer,
-    MotionStreak: cc.MotionStreak
+    MotionStreak: cc.MotionStreak,
+    CameraNode: cc.CameraNode
 };
 
 // __errorHandler
 window.__errorHandler = function (filename, lineno, message) {
 };
-
-// rename cc.Class to cc._Class
-cc._Class = cc.Class;
 
 // fix cc.formatStr (#2630)
 cc.formatStr = cc.js.formatStr;

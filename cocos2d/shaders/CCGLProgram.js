@@ -35,14 +35,6 @@ var math = cc.math;
  * @extends cc._Class
  */
 cc.GLProgram = cc._Class.extend(/** @lends cc.GLProgram# */{
-    _glContext: null,
-    _programObj: null,
-    _vertShader: null,
-    _fragShader: null,
-    _uniforms: null,
-    _hashForUniforms: null,
-    _usesTime: false,
-    _projectionUpdated: -1,
 
     // Uniform cache
     _updateUniformLocation: function (location) {
@@ -120,7 +112,11 @@ cc.GLProgram = cc._Class.extend(/** @lends cc.GLProgram# */{
         this._uniforms = {};
         this._hashForUniforms = {};
         this._glContext = glContext || cc._renderContext;
-
+        this._programObj = null;
+        this._vertShader = null;
+        this._fragShader = null;
+        this._usesTime = false;
+        this._projectionUpdated = -1;
         vShaderFileName && fShaderFileName && this.init(vShaderFileName, fShaderFileName);
     },
 
@@ -580,22 +576,23 @@ cc.GLProgram = cc._Class.extend(/** @lends cc.GLProgram# */{
         this._glContext.uniformMatrix4fv(locObj, false, matrixArray);
     },
 
-    setUniformLocationF32: function () {
-        if (arguments.length < 2)
-            return;
-
+    setUniformLocationF32: function (p1, p2, p3, p4, p5) {
+        'use strict';
         switch (arguments.length) {
+            case 0:
+            case 1:
+                return;
             case 2:
-                this.setUniformLocationWith1f(arguments[0], arguments[1]);
+                this.setUniformLocationWith1f(p1, p2);
                 break;
             case 3:
-                this.setUniformLocationWith2f(arguments[0], arguments[1], arguments[2]);
+                this.setUniformLocationWith2f(p1, p2, p3);
                 break;
             case 4:
-                this.setUniformLocationWith3f(arguments[0], arguments[1], arguments[2], arguments[3]);
+                this.setUniformLocationWith3f(p1, p2, p3, p4);
                 break;
             case 5:
-                this.setUniformLocationWith4f(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+                this.setUniformLocationWith4f(p1, p2, p3, p4, p5);
                 break;
         }
     },

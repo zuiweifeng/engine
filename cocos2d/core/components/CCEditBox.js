@@ -395,7 +395,7 @@ var EditBox = cc.Class({
         /**
          * !#en The event handler to be called when EditBox began to edit text.
          * !#zh 开始编辑文本输入框触发的事件回调。
-         * @property {Component.EventHandler} editingDidBegin
+         * @property {Component.EventHandler} editingDidBegan
          */
         editingDidBegan: {
             default: [],
@@ -593,7 +593,7 @@ cc.EditBox = module.exports = EditBox;
  * !#zh
  * 注意：此事件是从该组件所属的 Node 上面派发出来的，需要用 node.on 来监听。
  * @event editing-did-began
- * @param {Event} event
+ * @param {Event.EventCustom} event
  * @param {EditBox} event.detail - The EditBox component.
  */
 
@@ -603,7 +603,7 @@ cc.EditBox = module.exports = EditBox;
  * !#zh
  * 注意：此事件是从该组件所属的 Node 上面派发出来的，需要用 node.on 来监听。
  * @event editing-did-ended
- * @param {Event} event
+ * @param {Event.EventCustom} event
  * @param {EditBox} event.detail - The EditBox component.
  */
 
@@ -613,7 +613,7 @@ cc.EditBox = module.exports = EditBox;
  * !#zh
  * 注意：此事件是从该组件所属的 Node 上面派发出来的，需要用 node.on 来监听。
  * @event text-changed
- * @param {Event} event
+ * @param {Event.EventCustom} event
  * @param {EditBox} event.detail - The EditBox component.
  */
 
@@ -623,6 +623,6 @@ cc.EditBox = module.exports = EditBox;
  * !#zh
  * 注意：此事件是从该组件所属的 Node 上面派发出来的，需要用 node.on 来监听。
  * @event editing-return
- * @param {Event} event
+ * @param {Event.EventCustom} event
  * @param {EditBox} event.detail - The EditBox component.
  */

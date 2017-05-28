@@ -27,8 +27,8 @@
 
 // if "global_defs" not preprocessed by uglify, just declare them globally,
 // this may happened in release version's preview page.
-eval(
-    /* use EVAL to prevent the uglify from renaming symbols */
+Function(
+    /* use evaled code to prevent the uglify from renaming symbols */
     'if(typeof CC_TEST=="undefined")' +
         'CC_TEST=typeof tap=="object"||typeof QUnit=="object";' +
     'if(typeof CC_EDITOR=="undefined")' +
@@ -37,46 +37,19 @@ eval(
         'CC_DEV=CC_EDITOR||CC_TEST;' + /* CC_DEV contains CC_TEST and CC_EDITOR */
     'if(typeof CC_JSB=="undefined")' +
         'CC_JSB=false;'
-);
+)();
 
 // PREDEFINE
 
 require('./predefine');
 
-// LOAD BUNDLED COCOS2D
+// load Cocos2d engine code
 
 var isMainProcess = CC_EDITOR && Editor.isMainProcess;
 if (!isMainProcess) {
-    // LOAD ORIGIN COCOS2D
-    if (CC_EDITOR) {
-        try {
-            require('./bin/modular-cocos2d');
-        }
-        catch (e) {
-            if (e.code === 'MODULE_NOT_FOUND') {
-                Editor.Dialog.messageBox({
-                    type: 'error',
-                    buttons: [Editor.T('MESSAGE.ok')],
-                    message: Editor.T('EDITOR_MAIN.engine_not_build'),
-                    detail: e.stack,
-                    noLink: true,
-                });
-                return;
-            }
-            else {
-                throw e;
-            }
-        }
-    }
-    else {
-        require('./bin/modular-cocos2d');
-        if (!CC_TEST) {
-            require('./bin/modular-cocos2d-cut');
-        }
-    }
+    require('./cocos2d/index.js');
 }
 else {
-    // load modules for editor's core-level which included in modular-cocos2d.js
     cc._initDebugSetting(1);    // DEBUG_MODE_INFO
 }
 
@@ -85,12 +58,8 @@ else {
 require('./extends');
 
 if (CC_EDITOR) {
-    /**
-     * In editor, in addition to the modules defined in cc scope, you can also access to the internal modules by using _require.
-     * @method _require
-     * @example
-     * var isDomNode = cc._require('./cocos2d/core/platform/utils').isDomNode;
-     */
+    // In editor, in addition to the modules defined in cc scope, you can also access to the internal modules by using _require.
+    // var isDomNode = cc._require('./cocos2d/core/platform/utils').isDomNode;
     cc._require = require;
     /*
      * Checks if the extension is loaded.

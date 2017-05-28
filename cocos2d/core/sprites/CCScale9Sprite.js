@@ -22,7 +22,7 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-var EventTarget = require("../cocos2d/core/event/event-target");
+var EventTarget = require("../event/event-target");
 
 var dataPool = {
     _pool: {},
@@ -214,8 +214,8 @@ var scale9QuadGenerator = {
         var sizableHeight = preferSize.height - topHeight - bottomHeight;
         var xScale = preferSize.width / (leftWidth + rightWidth);
         var yScale = preferSize.height / (topHeight + bottomHeight);
-        xScale = xScale > 1 ? 1 : xScale;
-        yScale = yScale > 1 ? 1 : yScale;
+        xScale = (isNaN(xScale) || xScale > 1) ? 1 : xScale;
+        yScale = (isNaN(yScale) || yScale > 1) ? 1 : yScale;
         sizableWidth = sizableWidth < 0 ? 0 : sizableWidth;
         sizableHeight = sizableHeight < 0 ? 0 : sizableHeight;
         var x = this.x;
@@ -1409,23 +1409,25 @@ cc.Scale9Sprite = _ccsg.Node.extend({
 
         // Culling
         if (webgl) {
+            // disabled for camera for now, find a better way for webgl culling
+
             // x1, y1  leftBottom
             // x2, y2  rightBottom
             // x3, y3  leftTop
             // x4, y4  rightTop
-            var vert = this._isTriangle ? this._rawVerts : this._vertices,
-                x0 = vert[cornerId[0]], x1 = vert[cornerId[1]], x2 = vert[cornerId[2]], x3 = vert[cornerId[3]],
-                y0 = vert[cornerId[0] + 1], y1 = vert[cornerId[1] + 1], y2 = vert[cornerId[2] + 1], y3 = vert[cornerId[3] + 1];
-            if (((x0-vl.x) & (x1-vl.x) & (x2-vl.x) & (x3-vl.x)) >> 31 || // All outside left
-                ((vr.x-x0) & (vr.x-x1) & (vr.x-x2) & (vr.x-x3)) >> 31 || // All outside right
-                ((y0-vb.y) & (y1-vb.y) & (y2-vb.y) & (y3-vb.y)) >> 31 || // All outside bottom
-                ((vt.y-y0) & (vt.y-y1) & (vt.y-y2) & (vt.y-y3)) >> 31)   // All outside top
-            {
-                this._renderCmd._needDraw = false;
-            }
-            else {
-                this._renderCmd._needDraw = true;
-            }
+            // var vert = this._isTriangle ? this._rawVerts : this._vertices,
+            //     x0 = vert[cornerId[0]], x1 = vert[cornerId[1]], x2 = vert[cornerId[2]], x3 = vert[cornerId[3]],
+            //     y0 = vert[cornerId[0] + 1], y1 = vert[cornerId[1] + 1], y2 = vert[cornerId[2] + 1], y3 = vert[cornerId[3] + 1];
+            // if (((x0-vl.x) & (x1-vl.x) & (x2-vl.x) & (x3-vl.x)) >> 31 || // All outside left
+            //     ((vr.x-x0) & (vr.x-x1) & (vr.x-x2) & (vr.x-x3)) >> 31 || // All outside right
+            //     ((y0-vb.y) & (y1-vb.y) & (y2-vb.y) & (y3-vb.y)) >> 31 || // All outside bottom
+            //     ((vt.y-y0) & (vt.y-y1) & (vt.y-y2) & (vt.y-y3)) >> 31)   // All outside top
+            // {
+            //     this._renderCmd._needDraw = false;
+            // }
+            // else {
+            //     this._renderCmd._needDraw = true;
+            // }
         }
         else {
             var bb = this._renderCmd._currentRegion,

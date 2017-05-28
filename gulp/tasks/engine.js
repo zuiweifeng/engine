@@ -37,6 +37,7 @@ const Sourcemaps = require('gulp-sourcemaps');
 const EventStream = require('event-stream');
 const Chalk = require('chalk');
 const HandleErrors = require('../util/handleErrors');
+const Optimizejs = require('gulp-optimize-js');
 
 exports.buildCocosJs = function (sourceFile, outputFile, excludes, callback) {
     var outDir = Path.dirname(outputFile);
@@ -59,6 +60,9 @@ exports.buildCocosJs = function (sourceFile, outputFile, excludes, callback) {
     bundler = bundler.pipe(Buffer());
     bundler = bundler.pipe(Sourcemaps.init({loadMaps: true}));
     bundler = bundler.pipe(Minifier(uglifyOption, UglifyHarmony));
+    bundler = bundler.pipe(Optimizejs({
+        sourceMap: false
+    }));
     bundler = bundler.pipe(Sourcemaps.write('./', {
         sourceRoot: './',
         includeContent: true,
@@ -99,9 +103,15 @@ exports.buildCocosJsMin = function (sourceFile, outputFile, excludes, callback, 
     bundler = bundler.bundle();
     bundler = bundler.pipe(Source(outFile));
     bundler = bundler.pipe(Buffer());
-    if (createMap !== false)
+    if (createMap) {
+        console.error('Can not use sourcemap with optimize-js');
         bundler = bundler.pipe(Sourcemaps.init({loadMaps: true}));
+    }
     bundler = bundler.pipe(Minifier(uglifyOption, UglifyHarmony));
+    bundler = bundler.pipe(Optimizejs({
+        sourceMap: false
+    }));
+
     if (Size) {
         bundler = bundler.pipe(rawSize);
         bundler = bundler.pipe(zippedSize);
@@ -113,12 +123,13 @@ exports.buildCocosJsMin = function (sourceFile, outputFile, excludes, callback, 
             this.emit('end');
         }));
     }
-    if (createMap !== false)
+    if (createMap) {
         bundler = bundler.pipe(Sourcemaps.write('./', {
             sourceRoot: './',
             includeContent: true,
             addComment: true
         }));
+    }
     bundler = bundler.pipe(Gulp.dest(outDir));
     return bundler.on('end', callback);
 };
@@ -128,9 +139,7 @@ exports.buildPreview = function (sourceFile, outputFile, callback) {
     var outDir = Path.dirname(outputFile);
 
     var bundler = Utils.createBundler(sourceFile);
-    bundler
-        .ignore('./bin/modular-cocos2d-cut.js')
-        .bundle()
+    bundler.bundle()
         .on('error', HandleErrors.handler)
         .pipe(HandleErrors())
         .pipe(Source(outFile))
@@ -142,6 +151,9 @@ exports.buildPreview = function (sourceFile, outputFile, callback) {
             CC_TEST: false,
             CC_JSB: false
         }), UglifyHarmony))
+        .pipe(Optimizejs({
+            sourceMap: false
+        }))
         .pipe(Sourcemaps.write('./', {
             sourceRoot: '../',
             includeContent: false,
@@ -166,10 +178,13 @@ exports.buildJsb = function (sourceFile, outputFile, jsbSkipModules, callback) {
         .pipe(Buffer())
         .pipe(Minifier(Utils.uglifyOptions(false, {
             CC_EDITOR: false,
-            CC_DEV: false,
+            CC_DEV: false,  // CC_DEV should be false after build
             CC_TEST: false,
             CC_JSB: true
         }), UglifyHarmony))
+        .pipe(Optimizejs({
+            sourceMap: false
+        }))
         .pipe(Gulp.dest(outDir))
         .on('end', callback);
 };
@@ -193,6 +208,9 @@ exports.buildJsbMin = function (sourceFile, outputFile, jsbSkipModules, callback
             CC_TEST: false,
             CC_JSB: true
         }), UglifyHarmony))
+        .pipe(Optimizejs({
+            sourceMap: false
+        }))
         .pipe(Gulp.dest(outDir))
         .on('end', callback);
 };

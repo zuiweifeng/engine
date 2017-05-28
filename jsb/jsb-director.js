@@ -26,6 +26,11 @@
 'use strict';
 
 var AutoReleaseUtils = require('../cocos2d/core/load-pipeline/auto-release-utils');
+var ComponentScheduler = require('../cocos2d/core/component-scheduler');
+var NodeActivator = require('../cocos2d/core/node-activator');
+var EventListeners = require('../cocos2d/core/event/event-listeners');
+
+cc.director._purgeDirector = cc.director.purgeDirector;
 
 // cc.director
 cc.js.mixin(cc.director, {
@@ -34,10 +39,15 @@ cc.js.mixin(cc.director, {
      * All platform independent init process should be occupied here.
      */
     sharedInit: function () {
+        this._compScheduler = new ComponentScheduler();
+        this._nodeActivator = new NodeActivator();
+
+        var scheduler = this.getScheduler();
+
         // Animation manager
         if (cc.AnimationManager) {
             this._animationManager = new cc.AnimationManager();
-            this.getScheduler().scheduleUpdate(this._animationManager, cc.Scheduler.PRIORITY_SYSTEM, false);
+            scheduler.scheduleUpdate(this._animationManager, cc.Scheduler.PRIORITY_SYSTEM, false);
         }
         else {
             this._animationManager = null;
@@ -46,14 +56,29 @@ cc.js.mixin(cc.director, {
         // collider manager
         if (cc.CollisionManager) {
             this._collisionManager = new cc.CollisionManager();
-            this.getScheduler().scheduleUpdate(this._collisionManager, cc.Scheduler.PRIORITY_SYSTEM, false);
+            scheduler.scheduleUpdate(this._collisionManager, cc.Scheduler.PRIORITY_SYSTEM, false);
         }
         else {
             this._collisionManager = null;
         }
 
+        // physics manager
+        if (cc.PhysicsManager) {
+            this._physicsManager = new cc.PhysicsManager();
+            this.getScheduler().scheduleUpdate(this._physicsManager, cc.Scheduler.PRIORITY_SYSTEM, false);
+        }
+        else {
+            this._physicsManager = null;
+        }
+
         // WidgetManager
         cc._widgetManager.init(this);
+    },
+
+    purgeDirector: function () {
+        this._compScheduler.unscheduleAll();
+        this._nodeActivator.reset();
+        this._purgeDirector();
     },
 
     /**
@@ -65,12 +90,6 @@ cc.js.mixin(cc.director, {
         if (cc.eventManager)
             cc.eventManager.setEnabled(true);
 
-        // Action manager
-        var actionManager = this.getActionManager();
-        if (actionManager) {
-            this.getScheduler().scheduleUpdate(actionManager, cc.Scheduler.PRIORITY_SYSTEM, false);
-        }
-
         // Animation manager
         if (this._animationManager) {
             this.getScheduler().scheduleUpdate(this._animationManager, cc.Scheduler.PRIORITY_SYSTEM, false);
@@ -81,7 +100,26 @@ cc.js.mixin(cc.director, {
             this.getScheduler().scheduleUpdate(this._collisionManager, cc.Scheduler.PRIORITY_SYSTEM, false);
         }
 
+        // Physics manager
+        if (this._physicsManager) {
+            this.getScheduler().scheduleUpdate(this._physicsManager, cc.Scheduler.PRIORITY_SYSTEM, false);
+        }
+
         this.startAnimation();
+    },
+
+    getActionManager: function () {
+        return this._actionManager;
+    },
+
+    setActionManager: function (actionManager) {
+        if (this._actionManager !== actionManager) {
+            if (this._actionManager) {
+                this._scheduler.unscheduleUpdate(this._actionManager);
+            }
+            this._actionManager = actionManager;
+            this._scheduler.scheduleUpdate(this._actionManager, cc.Scheduler.PRIORITY_SYSTEM, false);
+        }
     },
 
     /**
@@ -100,6 +138,15 @@ cc.js.mixin(cc.director, {
      */
     getCollisionManager: function () {
         return this._collisionManager;
+    },
+
+    /**
+     * Returns the cc.PhysicsManager associated with this director.
+     * @method getPhysicsManager
+     * @return {PhysicsManager}
+     */
+    getPhysicsManager: function () {
+        return this._physicsManager;
     },
 
     /**
@@ -381,8 +428,25 @@ cc.js.mixin(cc.director, {
                 onLaunched(error);
             }
         });
-    }
+    },
+
+    __fastOn: function (type, callback, target) {
+        var listeners = this._bubblingListeners;
+        if (!listeners) {
+            listeners = this._bubblingListeners = new EventListeners();
+        }
+        listeners.add(type, callback, target);
+    },
+
+    __fastOff: function (type, callback, target) {
+        var listeners = this._bubblingListeners;
+        if (listeners) {
+            listeners.remove(type, callback, target);
+        }
+    },
 });
+
+cc.defineGetterSetter(cc.director, "actionManager", cc.director.getActionManager, cc.director.setActionManager);
 
 cc.EventTarget.call(cc.director);
 cc.js.addon(cc.director, cc.EventTarget.prototype);
@@ -396,8 +460,6 @@ cc.Director.EVENT_AFTER_UPDATE = 'director_after_update';
 cc.Director.EVENT_BEFORE_SCENE_LOADING = "director_before_scene_loading";
 cc.Director.EVENT_BEFORE_SCENE_LAUNCH = 'director_before_scene_launch';
 cc.Director.EVENT_AFTER_SCENE_LAUNCH = "director_after_scene_launch";
-cc.Director.EVENT_COMPONENT_UPDATE = 'director_component_update';
-cc.Director.EVENT_COMPONENT_LATE_UPDATE = 'director_component_late_update';
 cc.Director._EVENT_NEXT_TICK = '_director_next_tick';
 
 // Register listener objects in cc.Director to avoid possible crash caused by cc.eventManager.addCustomListener.
@@ -406,27 +468,27 @@ cc.Director._beforeUpdateListener = {
     event: cc.EventListener.CUSTOM,
     eventName: cc.Director.EVENT_BEFORE_UPDATE,
     callback: function () {
-        var dt = cc.director.getDeltaTime();
         // cocos-creator/fireball#5157
         cc.director.emit(cc.Director._EVENT_NEXT_TICK);
         // Call start for new added components
-        cc.director.emit(cc.Director.EVENT_BEFORE_UPDATE);
+        cc.director._compScheduler.startPhase();
         // Update for components
-        cc.director.emit(cc.Director.EVENT_COMPONENT_UPDATE, dt);
+        var dt = cc.director.getDeltaTime();
+        cc.director._compScheduler.updatePhase(dt);
     }
 };
 cc.Director._afterUpdateListener = {
     event: cc.EventListener.CUSTOM,
     eventName: cc.Director.EVENT_AFTER_UPDATE,
     callback: function () {
-        var dt = cc.director.getDeltaTime();
         // Late update for components
-        cc.director.emit(cc.Director.EVENT_COMPONENT_LATE_UPDATE, dt);
+        var dt = cc.director.getDeltaTime();
+        cc.director._compScheduler.lateUpdatePhase(dt);
         // User can use this event to do things after update
         cc.director.emit(cc.Director.EVENT_AFTER_UPDATE);
         // Destroy entities that have been removed recently
         cc.Object._deferredDestroy();
-        
+
         cc.director.emit(cc.Director.EVENT_BEFORE_VISIT, this);
     }
 };

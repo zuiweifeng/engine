@@ -24,6 +24,7 @@
  ****************************************************************************/
 var JS = require('../platform/js');
 var Path = require('../utils/CCPath');
+var misc = require('../utils/misc');
 var Pipeline = require('./pipeline');
 var LoadingItems = require('./loading-items');
 var PackDownloader = require('./pack-downloader');
@@ -79,7 +80,7 @@ function downloadImage (item, callback, isCrossOrigin, img) {
     }
 
     var url = urlAppendTimestamp(item.url);
-    img = img || new Image();
+    img = img || misc.imagePool.get();
     if (isCrossOrigin && window.location.protocol !== 'file:') {
         img.crossOrigin = 'anonymous';
     }
@@ -298,67 +299,67 @@ var ID = 'Downloader';
  */
 /**
  * Constructor of Downloader, you can pass custom supported types.
+ *
+ * @method constructor
+ * @param {Object} extMap Custom supported types with corresponded handler
  * @example
  *  var downloader = new Downloader({
  *      // This will match all url with `.scene` extension or all url with `scene` type
  *      'scene' : function (url, callback) {}
  *  });
- *
- * @method Downloader
- * @param {Object} extMap Custom supported types with corresponded handler
  */
 var Downloader = function (extMap) {
     this.id = ID;
     this.async = true;
     this.pipeline = null;
-    this.maxConcurrent = cc.sys.isMobile ? 2 : 512;
     this._curConcurrent = 0;
     this._loadQueue = [];
 
     this.extMap = JS.mixin(extMap, defaultMap);
 };
 Downloader.ID = ID;
-JS.mixin(Downloader.prototype, {
-    /**
-     * Add custom supported types handler or modify existing type handler.
-     * @method addHandlers
-     * @param {Object} extMap Custom supported types with corresponded handler
-     */
-    addHandlers: function (extMap) {
-        JS.mixin(this.extMap, extMap);
-    },
 
-    handle: function (item, callback) {
-        var self = this;
-        var downloadFunc = this.extMap[item.type] || this.extMap['default'];
-        if (this._curConcurrent < this.maxConcurrent) {
-            this._curConcurrent++;
-            downloadFunc.call(this, item, function (err, result) {
-                // Concurrent logic
+/**
+ * Add custom supported types handler or modify existing type handler.
+ * @method addHandlers
+ * @param {Object} extMap Custom supported types with corresponded handler
+ */
+Downloader.prototype.addHandlers = function (extMap) {
+    JS.mixin(this.extMap, extMap);
+};
+
+Downloader.prototype.handle = function (item, callback) {
+    var self = this;
+    var downloadFunc = this.extMap[item.type] || this.extMap['default'];
+    if (this._curConcurrent < cc.macro.DOWNLOAD_MAX_CONCURRENT) {
+        this._curConcurrent++;
+        downloadFunc.call(this, item, function (err, result) {
+            // Concurrent logic
+            setTimeout(function () {
                 self._curConcurrent = Math.max(0, self._curConcurrent - 1);
-                while (self._curConcurrent < self.maxConcurrent) {
+                while (self._curConcurrent < cc.macro.DOWNLOAD_MAX_CONCURRENT) {
                     var nextOne = self._loadQueue.shift();
                     if (!nextOne) {
                         break;
                     }
                     self.handle(nextOne.item, nextOne.callback);
                 }
+            }, 0);
 
-                callback && callback(err, result);
-            });
-        }
-        else if (item.ignoreMaxConcurrency) {
-            downloadFunc.call(this, item, function (err, result) {
-                callback && callback(err, result);
-            });
-        }
-        else {
-            this._loadQueue.push({
-                item: item,
-                callback: callback
-            });
-        }
+            callback && callback(err, result);
+        });
     }
-});
+    else if (item.ignoreMaxConcurrency) {
+        downloadFunc.call(this, item, function (err, result) {
+            callback && callback(err, result);
+        });
+    }
+    else {
+        this._loadQueue.push({
+            item: item,
+            callback: callback
+        });
+    }
+};
 
 Pipeline.Downloader = module.exports = Downloader;

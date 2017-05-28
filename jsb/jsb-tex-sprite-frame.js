@@ -89,7 +89,7 @@ cc.textureCache.removeTextureForKey = function (key) {
 // cc.Texture2D
 
 cc.Class._fastDefine('cc.Texture2D', cc.Texture2D, []);
-cc.Texture2D.$super = cc.RawAsset;
+cc.js.value(cc.Texture2D, '$super', cc.RawAsset);   // not inheritable in JSB and TypeScript
 
 cc.Texture2D.WrapMode = cc.Enum({
     REPEAT: 0x2901,
@@ -111,7 +111,7 @@ cc.js.get(prototype, 'pixelHeight', prototype.getPixelHeight);
 // cc.SpriteFrame
 
 cc.Class._fastDefine('cc.SpriteFrame', cc.SpriteFrame, []);
-cc.SpriteFrame.$super = cc.Asset;
+cc.js.value(cc.SpriteFrame, '$super', cc.Asset);    // not inheritable in JSB and TypeScript
 
 prototype = cc.SpriteFrame.prototype;
 
@@ -122,6 +122,10 @@ prototype.textureLoaded = function () {
 
 prototype._ctor = function (filename, rect, rotated, offset, originalSize) {
     this._name = '';
+    this.insetTop = 0;
+    this.insetBottom = 0;
+    this.insetLeft = 0;
+    this.insetRight = 0;
     if (filename !== undefined) {
         this.initWithTexture(filename, rect, rotated, offset, originalSize);
     } else {
@@ -191,16 +195,8 @@ prototype._refreshTexture = function (texture) {
         if (originalSize.width === 0 || originalSize.height === 0) {
             originalSize = cc.size(w, h);
         }
-
         var offset = this.getOffset();
         var rotated = this.isRotated();
-
-        if (this.insetTop === undefined) {
-            this.insetTop = 0;
-            this.insetBottom = 0;
-            this.insetLeft = 0;
-            this.insetRight = 0;
-        }
 
         this._initWithTexture(texture, rect, rotated, offset, originalSize);
 

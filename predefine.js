@@ -54,8 +54,11 @@ if (CC_DEV) {
 // polyfills
 /* require('./polyfill/bind'); */
 require('./polyfill/string');
-require('./polyfill/math');
+require('./polyfill/misc');
 require('./polyfill/array');
+if (!(CC_EDITOR && Editor.isMainProcess)) {
+    require('./polyfill/typescript');
+}
 
 // predefine some modules for cocos
 require('./cocos2d/core/platform/js');
@@ -69,7 +72,11 @@ require('./cocos2d/core/platform/CCMacro');
 require('./cocos2d/core/load-pipeline');
 require('./cocos2d/core/textures');
 
-if (!CC_JSB) {
+if (CC_JSB) {
+    // rename cc.Class to cc._Class
+    cc._Class = cc.Class;
+}
+else {
     require('./cocos2d/kazmath');
     require('./cocos2d/core/CCDirector');
     require('./cocos2d/core/CCDirectorWebGL');
@@ -79,15 +86,17 @@ if (!CC_JSB) {
         require('./cocos2d/core/platform/CCSAXParser');
         require('./cocos2d/core/platform/CCView');
         require('./cocos2d/core/platform/CCScreen');
-        require('./cocos2d/core/CCActionManager');
         require('./cocos2d/core/CCScheduler');
         require('./cocos2d/core/event-manager');
         require('./cocos2d/core/renderer');
         require('./cocos2d/shaders');
         require('./cocos2d/compression');
 
-        require('./CCBoot.js');
+        require('./CCBoot');
         require('./cocos2d/core/CCGame');
+
+        // Require in predefine to ensure modular-cocos2d can determine whether action module is included
+        require('./cocos2d/actions');
     }
 }
 

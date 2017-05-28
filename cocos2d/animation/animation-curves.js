@@ -1,7 +1,7 @@
 
 var bezierByTime = require('./bezier').bezierByTime;
 
-var binarySearch = require('./binary-search');
+var binarySearch = require('../core/utils/binary-search').binarySearchEpsilon;
 var WrapModeMask = require('./types').WrapModeMask;
 var WrappedInfo = require('./types').WrappedInfo;
 
@@ -390,6 +390,11 @@ var EventAnimCurve = cc.Class({
 
         var eventInfo = this.events[index];
         var events = eventInfo.events;
+        
+        if ( !this.target.isValid ) { 
+            return; 
+        }
+        
         var components = this.target._components;
 
         for (var i = 0;  i < events.length; i++) {
