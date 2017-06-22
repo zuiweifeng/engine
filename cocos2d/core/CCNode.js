@@ -36,8 +36,6 @@ var ANCHOR_CHANGED = 'anchor-changed';
 var ROTATION_CHANGED = 'rotation-changed';
 var SCALE_CHANGED = 'scale-changed';
 
-var CHILD_ADDED = 'child-added';
-var CHILD_REMOVED = 'child-removed';
 var CHILD_REORDER = 'child-reorder';
 
 var ERR_INVALID_NUMBER = CC_EDITOR && 'The %s is invalid';
@@ -1306,7 +1304,15 @@ var Node = cc.Class({
         var w = this.width,
             h = this.height;
         var rect = cc.rect(0, 0, w, h);
-        var trans = this.getNodeToWorldTransform();
+        
+        var trans;
+        if (cc.Camera.main) {
+            trans = cc.Camera.main.getNodeToCameraTransform(this);
+        }
+        else {
+            trans = this.getNodeToWorldTransform();
+        }
+
         cc._rectApplyAffineTransformIn(rect, trans);
         var left = point.x - rect.x,
             right = rect.x + rect.width - point.x,
