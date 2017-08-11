@@ -226,12 +226,12 @@ jsbLabel.prototype.getOutlineColor = function() {
 };
 
 
-cc.Label = function (string, fontHandle, spriteFrame) {
+cc.Label = function (string, fontHandle, spriteFrame, fontSize) {
     fontHandle = fontHandle || "Arial";
     var extName = cc.path.extname(fontHandle);
 
     var type = _ccsg.Label.Type.TTF;
-    this._fontSize = 40;
+    this._fontSize = fontSize;
 
     var label;
     if (extName === ".ttf") {

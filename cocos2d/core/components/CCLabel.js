@@ -531,7 +531,7 @@ var Label = cc.Class({
                         sgNode = this._sgNode = new _ccsg.Label(this.string, font.fntDataStr, font.spriteFrame);
                     } else {
                         cc.warnID(4012, font.name);
-                        sgNode = this._sgNode = new _ccsg.Label(this.string);
+                        sgNode = this._sgNode = new _ccsg.Label(this.string, null, null, this._fontSize);
                     }
                 } else {
                     sgNode = this._sgNode = new _ccsg.Label(this.string, font.fntDataStr, font.spriteFrame, font);
@@ -543,7 +543,7 @@ var Label = cc.Class({
         } else {
             var isAsset = font instanceof cc.Font;
             var ttfName = isAsset ? font.rawUrl : '';
-            sgNode = this._sgNode = new _ccsg.Label(this.string, ttfName);
+            sgNode = this._sgNode = new _ccsg.Label(this.string, ttfName, null, this._fontSize);
         }
 
         if (CC_JSB) {
@@ -557,7 +557,9 @@ var Label = cc.Class({
         sgNode.setVisible(false);
         sgNode.setHorizontalAlign( this.horizontalAlign );
         sgNode.setVerticalAlign( this.verticalAlign );
-        sgNode.setFontSize( this._fontSize );
+        if (!(font instanceof cc.TTFFont)) {
+            sgNode.setFontSize( this._fontSize );
+        }
         if (this.useSystemFont) {
             sgNode.setFontFileOrFamily(this.fontFamily);
         }
