@@ -231,7 +231,7 @@ cc.Label = function (string, fontHandle, spriteFrame, fontSize) {
     var extName = cc.path.extname(fontHandle);
 
     var type = _ccsg.Label.Type.TTF;
-    this._fontSize = fontSize;
+    this._fontSize = fontSize || 40;
 
     var label;
     if (extName === ".ttf") {
