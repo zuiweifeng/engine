@@ -543,7 +543,12 @@ var Label = cc.Class({
         } else {
             var isAsset = font instanceof cc.Font;
             var ttfName = isAsset ? font.rawUrl : '';
-            sgNode = this._sgNode = new _ccsg.Label(this.string, ttfName, null, this._fontSize);
+            if (CC_JSB) {
+                sgNode = this._sgNode = new _ccsg.Label(this.string, ttfName, null, this._fontSize);
+            }else{
+                sgNode = this._sgNode = new _ccsg.Label(this.string, ttfName);
+                sgNode.setFontSize(this._fontSize);
+            }
         }
 
         if (CC_JSB) {
