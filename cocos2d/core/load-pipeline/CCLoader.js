@@ -762,7 +762,7 @@ proto.release = function (asset) {
                 }
             }
             else if (asset instanceof cc.Texture2D) {
-                cc.textureCache.removeTextureForKey(item.url);
+                // cc.textureCache.removeTextureForKey(item.url);
             }
         }
     }

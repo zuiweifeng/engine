@@ -1305,7 +1305,7 @@ var Node = cc.Class({
         var w = this.width,
             h = this.height;
         var rect = cc.rect(0, 0, w, h);
-        
+
         var trans;
         if (cc.Camera && cc.Camera.main) {
             trans = cc.Camera.main.getNodeToCameraTransform(this);
@@ -1396,7 +1396,7 @@ var Node = cc.Class({
     runAction: ActionManagerExist ? function (action) {
         if (!this.active)
             return;
-        cc.assertID(action, 1618);
+        cc.assertID(action, 1618, this.name);
 
         if (!cc.macro.ENABLE_GC_FOR_NATIVE_OBJECTS) {
             this._retainAction(action);

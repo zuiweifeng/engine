@@ -73,6 +73,10 @@ cc.loader.addDownloadHandlers({
 
 
 function loadImage (item, callback) {
+    return loadImageByFormat(item,callback,cc.Texture2D.PIXEL_FORMAT_RGBA8888);
+}
+
+function loadImageByFormat(item, callback,format) {
     var url = item.url;
 
     var cachedTex = cc.textureCache.getTextureForKey(url);
@@ -99,16 +103,20 @@ function loadImage (item, callback) {
             }
             jsb.unregisterNativeRef(cc.textureCache, addImageCallback);
         };
-        cc.textureCache._addImageAsync(url, addImageCallback);
+        cc.textureCache._addImageAsync(url, addImageCallback,format);
     }
+}
+
+function loadImageByRGB565(item,callback){
+    return loadImageByFormat(item,callback,cc.Texture2D.PIXEL_FORMAT_RGB565);
 }
 
 cc.loader.addLoadHandlers({
     // Images
     'png' : loadImage,
-    'jpg' : loadImage,
+    'jpg' : loadImageByRGB565,
     'bmp' : loadImage,
-    'jpeg' : loadImage,
+    'jpeg' : loadImageByRGB565,
     'gif' : loadImage,
     'ico' : loadImage,
     'tiff' : loadImage,
