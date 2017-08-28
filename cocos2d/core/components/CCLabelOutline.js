@@ -96,13 +96,9 @@ var LabelOutline = cc.Class({
         var label = this.node.getComponent('cc.Label');
         var sgNode = this._labelSGNode = label && label._sgNode;
         if(this._labelSGNode) {
-            if (CC_JSB) {
-                sgNode.enableOutline(cc.color(this._color),this._width);
-            }else{
-                sgNode.setOutlined(true);
-                sgNode.setOutlineColor(cc.color(this._color));
-                sgNode.setOutlineWidth(this._width);
-            }
+            sgNode.setOutlined(true);
+            sgNode.setOutlineColor(cc.color(this._color));
+            sgNode.setOutlineWidth(this._width);
             sgNode.setMargin(this._width);
         }
     },
