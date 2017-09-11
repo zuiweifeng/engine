@@ -285,9 +285,10 @@ var audioEngine = {
         var audio = getAudioFromId(audioID);
         if (!audio)
             return;
+        audio.off('ended', audio._finishCallback);
 
-        audio.off('ended');
-        audio.on('ended', callback);
+        audio._finishCallback = callback;
+        audio.on('ended', audio._finishCallback);
     },
 
     /**
@@ -472,9 +473,9 @@ var audioEngine = {
     /**
      * !#en Preload audio file.
      * !#zh 预加载一个音频
-     * @param filePath The file path of an audio.
-     * @param callback The callback of an audio.
      * @method preload
+     * @param {String} filePath - The file path of an audio.
+     * @param {Function} callback - The callback of an audio.
      * @example
      * //example
      * cc.audioEngine.preload(path);
